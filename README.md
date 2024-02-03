@@ -43,6 +43,12 @@ cd ./github/workflows
 touch deploy-prod.yaml
 ```
 
+## Personal Access Tokenの作成とRepository secretの設定
+- Personal Access Token(classic)をrepo権限で作成。トークンの値は控えておきましょう。Personal Access Token の作成方法がわからないという方はこちらの記事のトークンの発行を参考にして下さい。
+
+- 開発用リポジトリのSettingsタブ -> Secrets and variables -> Actions -> Repository secrets -> New repository secret にPERSONAL_ACCESS_TOKENの名前で作成。1.で作成した Personal Access Tokenの値を入れて保存します。
+
+
 
 # React + TypeScript + Vite
 
