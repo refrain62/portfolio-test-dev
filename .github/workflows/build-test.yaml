@@ -1,0 +1,59 @@
+name: Build test
+on:
+  push:
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
+
+env:
+  BOT_GITHUB_NAME: github-actions[bot]
+  BOT_GITHUB_MAIL: 41898282+github-actions[bot]@users.noreply.github.com
+  REMOTE_DEV_REPOSITORY: refrain62/portfolio-test-dev
+  LOCAL_DEV_REPOSITORY: dev
+  PAT: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+jobs:
+  test-npm-run-build:
+    name:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout ${{ env.LOCAL_DEV_REPOSITORY }} repository
+        run: |
+          set -x
+          git -v
+          git clone -b ${{ github.ref_name }} --depth=1 https://${{ env.PAT }}@github.com/${{ env.REMOTE_DEV_REPOSITORY }}.git ${{ env.LOCAL_DEV_REPOSITORY }}
+      - name: Delete default node and npm
+        run: |
+          set -x
+          node -v
+          npm -v
+          rm -f $(which node)
+          rm -f $(which npm)
+      - name: Install node with volta
+        run: |
+          set -x
+          curl -V
+          jq -V
+          curl https://get.volta.sh | bash
+          ${HOME}/.volta/bin/volta -v
+          cd ${{ env.LOCAL_DEV_REPOSITORY }}
+          pwd && ls -la
+          test ! -e package.json && echo "Error: package.json does not exist." && exit 1
+          ${HOME}/.volta/bin/volta install node@$(jq -r .volta.node package.json)
+          test ! -e package-lock.json && echo "Error: package-lock.json does not exist." && exit 1
+          ${HOME}/.volta/bin/volta which node
+          ${HOME}/.volta/bin/volta which npm
+      - name: Install node modules
+        run: |
+          set -x
+          cd ${{ env.LOCAL_DEV_REPOSITORY }}
+          ${HOME}/.volta/bin/volta -v
+          ${HOME}/.volta/bin/volta run --bundled-npm npm ci
+        shell: bash
+      - name: Build react
+        run: |
+          set -x
+          cd ${{ env.LOCAL_DEV_REPOSITORY }}
+          ${HOME}/.volta/bin/volta -v
+          ${HOME}/.volta/bin/volta run --bundled-npm npm run build

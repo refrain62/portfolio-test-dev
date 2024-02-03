@@ -20,7 +20,28 @@ github actions の workflow を使う場合は、package.jsonから node バー�
 $ volta pin node@20.10.0
 ```
 
+# ルートのパスについて設定ファイルの修正
+vite.config.ts
+```
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react-swc'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+ plugins: [react()],
+ base: '/portfolio-prod/'
+})
+```
+
 ここまでで dev側の準備完了
+
+## Github actionの設定
+.github/workflows ディレクトリは以下に配置
+```
+mkdir -p .github/workflows
+cd ./github/workflows
+touch deploy-prod.yaml
+```
 
 
 # React + TypeScript + Vite
